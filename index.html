@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Spirit Airlines – Restructuring Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050816;
+      --bg-alt: #0b1220;
+      --card: #111827;
+      --accent: #22c55e;
+      --accent-soft: rgba(34,197,94,0.12);
+      --accent-warn: #f97316;
+      --accent-danger: #ef4444;
+      --border-subtle: #1f2937;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --pill: #111827;
+      --shadow-soft: 0 18px 40px rgba(15,23,42,0.55);
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+      --gap: 1.5rem;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #111827 0, #020617 45%, #000 100%);
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+
+    a {
+      color: #38bdf8;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 3.5rem;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      gap: var(--gap);
+      align-items: center;
+      margin-bottom: 2.5rem;
+    }
+
+    @media (max-width: 900px) {
+      header {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .hero-title {
+      font-size: clamp(2.1rem, 3vw, 2.6rem);
+      font-weight: 650;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.4rem;
+    }
+
+    .hero-subtitle {
+      font-size: 0.98rem;
+      color: var(--text-muted);
+      max-width: 36rem;
+    }
+
+    .hero-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1.2rem;
+    }
+
+    .pill {
+      background: rgba(15,23,42,0.9);
+      border-radius: var(--radius-pill);
+      padding: 0.4rem 0.9rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border: 1px solid rgba(55,65,81,0.8);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .pill-badge {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+
+    .hero-metrics {
+      background: radial-gradient(circle at top, #111827 0, #020617 70%);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      padding: 1.1rem 1.25rem;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+      font-size: 0.85rem;
+    }
+
+    .metric-label {
+      color: var(--text-muted);
+      margin-bottom: 0.2rem;
+    }
+
+    .metric-value {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .metric-chip {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .metric-value.negative {
+      color: var(--accent-danger);
+    }
+
+    .metric-value.positive {
+      color: var(--accent);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+      gap: 2rem;
+    }
+
+    @media (max-width: 1000px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    section {
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: linear-gradient(145deg, rgba(15,23,42,0.96), rgba(15,23,42,0.9));
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      padding: 1.3rem 1.35rem 1.6rem;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(56,189,248,0.16), transparent 55%);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-bottom: 0.9rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-title {
+      font-size: 0.98rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+    }
+
+    .card-tag {
+      font-size: 0.74rem;
+      padding: 0.18rem 0.6rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(55,65,81,0.85);
+      background: rgba(15,23,42,0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .card-body {
+      position: relative;
+      z-index: 1;
+      font-size: 0.9rem;
+      color: #e5e7eb;
+    }
+
+    .card-body p {
+      margin: 0.2rem 0 0.55rem;
+    }
+
+    .key-points {
+      padding-left: 1.2rem;
+      margin: 0.4rem 0 0.2rem;
+    }
+
+    .key-points li {
+      margin-bottom: 0.25rem;
+    }
+
+    /* Timeline */
+
+    .timeline {
+      list-style: none;
+      margin: 0;
+      padding: 0.4rem 0 0;
+      border-left: 1px solid rgba(55,65,81,0.9);
+    }
+
+    .timeline-item {
+      position: relative;
+      padding: 0.35rem 0 0.65rem 1.1rem;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -5px;
+      top: 0.65rem;
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.25);
+    }
+
+    .timeline-date {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+      margin-bottom: 0.1rem;
+    }
+
+    .timeline-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.1rem;
+    }
+
+    .timeline-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Bar chart */
+
+    .chart {
+      margin-top: 0.7rem;
+    }
+
+    .chart-title {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .bar-chart {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-top: 0.2rem;
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    .bar-label {
+      width: 3.3rem;
+      color: var(--text-muted);
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 14px;
+      border-radius: 999px;
+      background: rgba(31,41,55,0.9);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #22c55e, #0ea5e9);
+    }
+
+    .bar-fill.negative {
+      background: linear-gradient(90deg, #ef4444, #f97316);
+    }
+
+    .bar-value {
+      width: 4.7rem;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-muted);
+    }
+
+    /* Fleet mini-chart */
+
+    .fleet-legend {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Risk dashboard */
+
+    .risk-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.7rem;
+    }
+
+    @media (max-width: 600px) {
+      .risk-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .risk-item {
+      padding: 0.5rem 0.6rem;
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.9);
+      font-size: 0.82rem;
+    }
+
+    .risk-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.1rem;
+    }
+
+    .risk-label {
+      font-weight: 500;
+    }
+
+    .risk-level {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.5rem;
+      border-radius: var(--radius-pill);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .risk-level.high {
+      background: rgba(248,113,113,0.18);
+      color: #fecaca;
+    }
+
+    .risk-level.medium {
+      background: rgba(251,191,36,0.15);
+      color: #facc15;
+    }
+
+    .risk-level.low {
+      background: rgba(45,212,191,0.12);
+      color: #5eead4;
+    }
+
+    .risk-text {
+      color: var(--text-muted);
+    }
+
+    /* Links card */
+
+    .link-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0.2rem 0 0;
+      font-size: 0.84rem;
+    }
+
+    .link-list li {
+      margin-bottom: 0.25rem;
+    }
+
+    .footer-note {
+      margin-top: 1.1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .badge-inline {
+      font-size: 0.7rem;
+      padding: 0.12rem 0.45rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(55,65,81,0.85);
+      margin-left: 0.35rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div>
+        <div class="hero-title">Spirit Airlines – Restructuring Dashboard</div>
+        <div class="hero-subtitle">
+          Second Chapter 11 case overview for internal asset servicing and corporate actions teams.
+          Focused on capital structure, DIP financing, fleet actions, and key watchpoints.
+        </div>
+        <div class="hero-pills">
+          <div class="pill">
+            <span class="pill-badge"></span>
+            Second Chapter 11 filed Aug&nbsp;29&nbsp;2025
+          </div>
+          <div class="pill">
+            <span class="pill-badge"></span>
+            DIP facility: up to $475&nbsp;million
+          </div>
+          <div class="pill">
+            <span class="pill-badge"></span>
+            AerCap settlement: $150&nbsp;million + 27 lease rejections
+          </div>
+          <div class="pill">
+            <span class="pill-badge"></span>
+            Last updated: Nov&nbsp;22&nbsp;2025
+          </div>
+        </div>
+      </div>
+      <aside class="hero-metrics">
+        <div class="metric-grid">
+          <div>
+            <div class="metric-label">Status</div>
+            <div class="metric-value">Active Chapter&nbsp;11</div>
+            <div class="metric-chip">Operations ongoing; tickets & loyalty honored</div>
+          </div>
+          <div>
+            <div class="metric-label">DIP Financing</div>
+            <div class="metric-value">$475m</div>
+            <div class="metric-chip">Existing bondholders; $200m available immediately</div>
+          </div>
+          <div>
+            <div class="metric-label">Projected Net Income 2025</div>
+            <div class="metric-value negative">-$804m</div>
+            <div class="metric-chip">Losses expected through 2026</div>
+          </div>
+          <div>
+            <div class="metric-label">Projected Net Income 2027</div>
+            <div class="metric-value positive">+$219m</div>
+            <div class="metric-chip">First projected profit since 2019</div>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <main>
+      <!-- Left column -->
+      <div>
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title">Case Snapshot</div>
+            <div class="card-tag">High-level view</div>
+          </div>
+          <div class="card-body">
+            <p>
+              Spirit Airlines is in its <strong>second Chapter 11</strong> in less than a year. The
+              first restructuring (Nov&nbsp;2024–Mar&nbsp;2025) focused on
+              <strong>deleveraging and new equity</strong>. The current case (filed
+              Aug&nbsp;29&nbsp;2025) goes deeper by:
+            </p>
+            <ul class="key-points">
+              <li>Implementing a <strong>$475m debtor-in-possession (DIP) credit facility</strong> provided by existing bondholders.</li>
+              <li>Rolling up a substantial portion of <strong>prepetition senior secured notes</strong> into superpriority DIP claims.</li>
+              <li>Restructuring the fleet via a <strong>landmark settlement with AerCap</strong> and broad lease rejections.</li>
+              <li>Cutting capacity, routes, and headcount, while targeting a return to profit by <strong>2027</strong>.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title">Restructuring Timeline</div>
+            <div class="card-tag">Context</div>
+          </div>
+          <div class="card-body">
+            <ul class="timeline">
+              <li class="timeline-item">
+                <span class="timeline-dot"></span>
+                <div class="timeline-date">Nov&nbsp;18&nbsp;2024</div>
+                <div class="timeline-title">First Chapter 11 filing</div>
+                <div class="timeline-text">
+                  Spirit files for Chapter 11 amid >$2.5bn cumulative losses and failed merger attempts.
+                </div>
+              </li>
+              <li class="timeline-item">
+                <span class="timeline-dot"></span>
+                <div class="timeline-date">Mar&nbsp;12&nbsp;2025</div>
+                <div class="timeline-title">Emerges from first restructuring</div>
+                <div class="timeline-text">
+                  Equitizes ≈$795m of funded debt and raises $350m in new equity; issues new senior secured notes and exits court protection.
+                </div>
+              </li>
+              <li class="timeline-item">
+                <span class="timeline-dot"></span>
+                <div class="timeline-date">Aug&nbsp;29&nbsp;2025</div>
+                <div class="timeline-title">Second Chapter 11 filed</div>
+                <div class="timeline-text">
+                  Parent Spirit Aviation Holdings re-files in SDNY after warning of “substantial doubt” about going-concern status.
+                </div>
+              </li>
+              <li class="timeline-item">
+                <span class="timeline-dot"></span>
+                <div class="timeline-date">Sep&nbsp;30&nbsp;2025</div>
+                <div class="timeline-title">DIP &amp; AerCap deal announced</div>
+                <div class="timeline-text">
+                  Company announces up to $475m multi-tranche DIP from bondholders and a framework AerCap settlement including lease rejections and cash injection.
+                </div>
+              </li>
+              <li class="timeline-item">
+                <span class="timeline-dot"></span>
+                <div class="timeline-date">Oct&nbsp;10&nbsp;2025</div>
+                <div class="timeline-title">Court approves DIP &amp; AerCap settlement</div>
+                <div class="timeline-text">
+                  Bankruptcy Court grants interim DIP order and approves a key agreement with AerCap, enabling Spirit to draw on the facility and execute fleet actions.
+                </div>
+              </li>
+              <li class="timeline-item">
+                <span class="timeline-dot"></span>
+                <div class="timeline-date">Oct–Nov&nbsp;2025</div>
+                <div class="timeline-title">Note roll-up &amp; transformation plan</div>
+                <div class="timeline-text">
+                  Existing bondholders participate in DIP and roll a large portion of senior secured notes into DIP claims. Spirit publishes projections showing losses through 2026 and targeted profit in 2027.
+                </div>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title">Capital Structure &amp; DIP Overview</div>
+            <div class="card-tag">Credit lens</div>
+          </div>
+          <div class="card-body">
+            <p>
+              The current case is <strong>creditor-driven</strong>. Existing secured bondholders are now both
+              <strong>DIP lenders</strong> and key plan stakeholders.
+            </p>
+            <ul class="key-points">
+              <li>DIP credit agreement: up to <strong>$475m</strong>, with <strong>$200m</strong> available immediately upon approval and additional delayed-draw tranches.</li>
+              <li>DIP includes a <strong>roll-up</strong> of a substantial portion of prepetition senior notes into superpriority DIP claims, pushing those obligations to the front of the recovery waterfall.</li>
+              <li>Legacy equity is effectively out-of-the-money; unsecured creditors and non-participating noteholders likely rely on residual value and plan negotiations.</li>
+            </ul>
+
+            <div class="chart">
+              <div class="chart-title">Projected net income (management case)</div>
+              <div class="bar-chart">
+                <div class="bar-row">
+                  <div class="bar-label">2025E</div>
+                  <div class="bar-track">
+                    <div class="bar-fill negative" style="width:100%;"></div>
+                  </div>
+                  <div class="bar-value">-$804m</div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-label">2026E</div>
+                  <div class="bar-track">
+                    <div class="bar-fill negative" style="width:18%;"></div>
+                  </div>
+                  <div class="bar-value">-$145m</div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-label">2027E</div>
+                  <div class="bar-track">
+                    <div class="bar-fill" style="width:27%;"></div>
+                  </div>
+                  <div class="bar-value">+$219m</div>
+                </div>
+              </div>
+              <div class="fleet-legend">
+                <span>Losses through 2026</span>
+                <span>First profit inflection in 2027</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right column -->
+      <div>
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title">Fleet, Network &amp; AerCap</div>
+            <div class="card-tag">Operating lens</div>
+          </div>
+          <div class="card-body">
+            <p>
+              A large portion of the restructuring value comes from <strong>shrinking and reshaping the fleet</strong>
+              and exiting unprofitable flying.
+            </p>
+            <ul class="key-points">
+              <li>Settlement with <strong>AerCap</strong>, the largest lessor: $150m cash to Spirit, rejection of 27 existing leases, cancellation of dozens of future deliveries, and new leases for 30 aircraft from 2027–2029.</li>
+              <li>Broader court approvals allow rejection of additional leases, reducing the active fleet from roughly <strong>~214 to ~114 aircraft</strong> over the plan horizon.</li>
+              <li>Capacity cuts: initial <strong>25% reduction</strong> in flying starting November 2025, with further reductions planned in 2026 before returning to measured growth.</li>
+              <li>Headcount: significant pilot demotions/furloughs and plans to furlough ~1,800 flight attendants, with wage and benefit concessions negotiated with unions.</li>
+            </ul>
+
+            <div class="chart">
+              <div class="chart-title">Indicative fleet size (simplified)</div>
+              <div class="bar-chart">
+                <div class="bar-row">
+                  <div class="bar-label">Pre-BK</div>
+                  <div class="bar-track">
+                    <div class="bar-fill" style="width:100%;"></div>
+                  </div>
+                  <div class="bar-value">≈214 a/c</div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-label">Plan</div>
+                  <div class="bar-track">
+                    <div class="bar-fill negative" style="width:53%;"></div>
+                  </div>
+                  <div class="bar-value">≈114 a/c</div>
+                </div>
+              </div>
+              <div class="fleet-legend">
+                <span>Higher fixed cost base</span>
+                <span>Smaller, “strongest markets” footprint</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title">Risk Dashboard</div>
+            <div class="card-tag">For internal monitoring</div>
+          </div>
+          <div class="card-body">
+            <div class="risk-grid">
+              <div class="risk-item">
+                <div class="risk-header">
+                  <div class="risk-label">Execution risk</div>
+                  <div class="risk-level high">High</div>
+                </div>
+                <div class="risk-text">
+                  Multi-step transformation (fleet, labor, network) under tight liquidity and DIP milestones; sensitive to demand and fuel.
+                </div>
+              </div>
+              <div class="risk-item">
+                <div class="risk-header">
+                  <div class="risk-label">Creditor control</div>
+                  <div class="risk-level medium">Medium</div>
+                </div>
+                <div class="risk-text">
+                  DIP and roll-up concentrate power with existing bondholders; plan negotiations and valuation will determine ultimate recoveries.
+                </div>
+              </div>
+              <div class="risk-item">
+                <div class="risk-header">
+                  <div class="risk-label">Operational continuity</div>
+                  <div class="risk-level medium">Medium</div>
+                </div>
+                <div class="risk-text">
+                  Airline intends to keep flying; route exits and capacity cuts may impact customers but core operations and loyalty remain active.
+                </div>
+              </div>
+              <div class="risk-item">
+                <div class="risk-header">
+                  <div class="risk-label">Residual value</div>
+                  <div class="risk-level high">High</div>
+                </div>
+                <div class="risk-text">
+                  Legacy equity is effectively wiped; unsecured creditors rely on upside versus the DIP / rolled-up noteholder group and lessor claims.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title">Key Public Sources</div>
+            <div class="card-tag">Verification</div>
+          </div>
+          <div class="card-body">
+            <p>
+              Links below point to the main public disclosures and coverage used to populate this page.
+            </p>
+            <ul class="link-list">
+              <li>
+                Spirit IR – <a href="https://ir.spirit.com/news/news-details/2025/Spirit-Airlines-Emerges-from-Financial-Restructuring-Better-Positioned-to-Advance-its-Transformation-and-Enhanced-Guest-Experience/default.aspx" target="_blank" rel="noopener noreferrer">Emergence from first restructuring (Mar&nbsp;12&nbsp;2025)</a>
+              </li>
+              <li>
+                Spirit IR – <a href="https://ir.spirit.com/news/news-details/2025/Spirit-Airlines-Receives-Court-Approval-for-475-Million-Debtor-in-Possession-Financing-and-Key-Agreement-with-its-Largest-Aircraft-Lessor/default.aspx" target="_blank" rel="noopener noreferrer">$475m DIP &amp; AerCap agreement (Oct&nbsp;10&nbsp;2025)</a>
+              </li>
+              <li>
+                SEC 8-K – <a href="https://www.sec.gov/Archives/edgar/data/1498710/000095010325013149/dp235820_8k.htm" target="_blank" rel="noopener noreferrer">Interim DIP order &amp; credit agreement summary</a>
+              </li>
+              <li>
+                Reuters – <a href="https://www.reuters.com/business/spirit-airlines-files-second-bankruptcy-year-financial-challenges-persist-2025-08-29/" target="_blank" rel="noopener noreferrer">Second Chapter 11 filing (Aug&nbsp;29&nbsp;2025)</a>
+                <span class="badge-inline">Case trigger</span>
+              </li>
+              <li>
+                Reuters – <a href="https://www.reuters.com/business/spirit-airlines-aims-220-million-net-income-2027-turnaround-2025-10-14/" target="_blank" rel="noopener noreferrer">Losses 2025–26 and 2027 profit projection</a>
+              </li>
+              <li>
+                Reuters – <a href="https://www.reuters.com/legal/litigation/spirit-airlines-cancels-airbus-order-settlement-with-aercap-2025-10-10/" target="_blank" rel="noopener noreferrer">AerCap settlement: lease rejections &amp; $150m payment</a>
+              </li>
+              <li>
+                Airways / other trade – <a href="https://airwaysmag.com/new-post/spirit-cuts-aircraft-fleet-half" target="_blank" rel="noopener noreferrer">Fleet reduced by nearly half through lease rejections</a>
+              </li>
+              <li>
+                World Aviation Festival / trade – <a href="https://worldaviationfestival.com/blog/airlines/spirit-airlines-releases-new-projections-expects-profit-by-2027/" target="_blank" rel="noopener noreferrer">Long-term EBITDAR and capacity guidance</a>
+              </li>
+            </ul>
+
+            <div class="footer-note">
+              Figures on this page are simplified for internal decision support and should be monitored against the latest SEC filings, Spirit IR releases, and court documents as the case evolves.
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
